@@ -65,7 +65,7 @@ namespace SampleUserControlLibrary
         public static DependencyProperty SampleScenarioListProperty =
             DependencyProperty.Register("SampleScenarioList", typeof(Scenario[]), typeof(SampleScenarios));
 
-        private SubscriptionKeyPage _subscriptionPage;
+        public SubscriptionKeyPage _subscriptionPage;
 
         public string SampleTitle
         {
@@ -83,14 +83,14 @@ namespace SampleUserControlLibrary
             }
         }
 
-        /// <summary>
-        /// Gets or sets the disclaimer
-        /// </summary>
-        public string Disclaimer
-        {
-            get { return _disclaimerTextBlock.Text; }
-            set { _disclaimerTextBlock.Text = value; }
-        }
+        ///// <summary>
+        ///// Gets or sets the disclaimer
+        ///// </summary>
+        //public string Disclaimer
+        //{
+        //    get { return _disclaimerTextBlock.Text; }
+        //    set { _disclaimerTextBlock.Text = value; }
+        //}
 
         public string SubscriptionKey
         {
@@ -98,23 +98,11 @@ namespace SampleUserControlLibrary
             set;
         }
 
-        public string SubscriptionEndpoint
-        {
-            get;
-            set;
-        }
-
-        public void SetSubscriptionPageEndpoint(string endpoint)
-        {
-            _subscriptionPage.SetSubscriptionEndpoint(endpoint);
-        }
-
         public SampleScenarios()
         {
             InitializeComponent();
             _subscriptionPage = new SubscriptionKeyPage(this);
             SubscriptionKey = _subscriptionPage.SubscriptionKey;
-            SubscriptionEndpoint = _subscriptionPage.SubscriptionEndpoint;
 
             SampleTitle = "Replace SampleNames with SampleScenarios.SampleTitle property";
 
@@ -126,8 +114,9 @@ namespace SampleUserControlLibrary
 
             _scenarioListBox.ItemsSource = SampleScenarioList;
 
-            _scenarioFrame.Navigate(_subscriptionPage);
+            //_scenarioFrame.Navigate(_subscriptionPage);
         }
+
 
         public void Log(string logMessage)
         {

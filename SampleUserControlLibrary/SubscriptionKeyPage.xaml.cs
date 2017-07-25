@@ -46,13 +46,9 @@ namespace SampleUserControlLibrary
     public partial class SubscriptionKeyPage : Page, INotifyPropertyChanged
     {
         private readonly string _isolatedStorageSubscriptionKeyFileName = "Subscription.txt";
-        private readonly string _isolatedStorageSubscriptionEndpointFileName = "SubscriptionEndpoint.txt";
-
-        private readonly string _defaultSubscriptionKeyPromptMessage = "Paste your subscription key here firstly";
-        private readonly string _defaultSubscriptionEndpointPromptMessage = "Paste your endpoint here to start";
+        private readonly string _defaultSubscriptionKeyPromptMessage = "Paste your subscription key here to start";
 
         private static string s_subscriptionKey;
-        private static string s_subscriptionEndpoint;
 
         private SampleScenarios _sampleScenarios;
         public SubscriptionKeyPage(SampleScenarios sampleScenarios)
@@ -62,7 +58,6 @@ namespace SampleUserControlLibrary
 
             DataContext = this;
             SubscriptionKey = GetSubscriptionKeyFromIsolatedStorage();
-            SubscriptionEndpoint = GetSubscriptionEndpointFromIsolatedStorage();
         }
 
         /// <summary>
@@ -84,24 +79,6 @@ namespace SampleUserControlLibrary
         }
 
         /// <summary>
-        /// Gets or sets subscription endpoint
-        /// </summary>
-        public string SubscriptionEndpoint
-        {
-            get
-            {
-                return s_subscriptionEndpoint;
-            }
-
-            set
-            {
-                s_subscriptionEndpoint = value;
-                OnPropertyChanged<string>();
-                _sampleScenarios.SubscriptionEndpoint = s_subscriptionEndpoint;
-            }
-        }
-
-        /// <summary>
         /// Implement INotifyPropertyChanged interface
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
@@ -119,6 +96,7 @@ namespace SampleUserControlLibrary
                 handler(this, new PropertyChangedEventArgs(caller));
             }
         }
+
 
         /// <summary>
         /// Gets the subscription key from isolated storage.
@@ -153,39 +131,6 @@ namespace SampleUserControlLibrary
         }
 
         /// <summary>
-        /// Gets the subscription endpoint from isolated storage.
-        /// </summary>
-        /// <returns></returns>
-        private string GetSubscriptionEndpointFromIsolatedStorage()
-        {
-            string subscriptionEndpoint = null;
-
-            using (IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null))
-            {
-                try
-                {
-                    using (var iStreamForEndpoint = new IsolatedStorageFileStream(_isolatedStorageSubscriptionEndpointFileName, FileMode.Open, isoStore))
-                    {
-                        using (var readerForEndpoint = new StreamReader(iStreamForEndpoint))
-                        {
-                            subscriptionEndpoint = readerForEndpoint.ReadLine();
-                        }
-                    }
-                }
-                catch (FileNotFoundException)
-                {
-                    subscriptionEndpoint = null;
-                }
-            }
-            if (string.IsNullOrEmpty(subscriptionEndpoint))
-            {
-                subscriptionEndpoint = _defaultSubscriptionEndpointPromptMessage;
-            }
-            return subscriptionEndpoint;
-        }
-
-
-        /// <summary>
         /// Saves the subscription key to isolated storage.
         /// </summary>
         /// <param name="subscriptionKey">The subscription key.</param>
@@ -204,71 +149,36 @@ namespace SampleUserControlLibrary
         }
 
         /// <summary>
-        /// Saves the subscription endpoint to isolated storage.
-        /// </summary>
-        /// <param name="subscriptionEndpoint">The subscription endpoint.</param>
-        private void SaveSubscriptionEndpointToIsolatedStorage(string subscriptionEndpoint)
-        {
-            using (IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null))
-            {
-                using (var oStream = new IsolatedStorageFileStream(_isolatedStorageSubscriptionEndpointFileName, FileMode.Create, isoStore))
-                {
-                    using (var writer = new StreamWriter(oStream))
-                    {
-                        writer.WriteLine(subscriptionEndpoint);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Set an endpoint when there is no legal endpoint value
-        /// </summary>
-        /// <param name="endpoint"></param>
-        public void SetSubscriptionEndpoint(string endpoint)
-        {
-            string subscriptionEndpoint = null;
-            subscriptionEndpoint = GetSubscriptionEndpointFromIsolatedStorage();
-            if(string.Equals(subscriptionEndpoint, _defaultSubscriptionEndpointPromptMessage))
-            {
-                SubscriptionEndpoint = endpoint;
-            }
-        }
-
-        /// <summary>
-        /// Handles the Click event of the saveSetting key save button.
+        /// Handles the Click event of the subscription key save button.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
-        private void SaveSetting_Click(object sender, RoutedEventArgs e)
+        private void SaveKey_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 SaveSubscriptionKeyToIsolatedStorage(SubscriptionKey);
-                SaveSubscriptionEndpointToIsolatedStorage(SubscriptionEndpoint);
-                MessageBox.Show("Subscription key and endpoint are saved in your disk.\nYou do not need to paste the key next time.", "Subscription Setting");
+                MessageBox.Show("Subscription key is saved in your disk.\nYou do not need to paste the key next time.", "Subscription Key");
             }
             catch (System.Exception exception)
             {
-                MessageBox.Show("Fail to save subscription key & endpoint. Error message: " + exception.Message,
-                    "Subscription Setting", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Fail to save subscription key. Error message: " + exception.Message,
+                    "Subscription Key", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void DeleteSetting_Click(object sender, RoutedEventArgs e)
+        private void DeleteKey_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 SubscriptionKey = _defaultSubscriptionKeyPromptMessage;
-                SubscriptionEndpoint = _defaultSubscriptionEndpointPromptMessage;
-                SaveSubscriptionEndpointToIsolatedStorage("");
                 SaveSubscriptionKeyToIsolatedStorage("");
-                MessageBox.Show("Subscription setting is deleted from your disk.", "Subscription Setting");
+                MessageBox.Show("Subscription key is deleted from your disk.", "Subscription Key");
             }
             catch (System.Exception exception)
             {
-                MessageBox.Show("Fail to delete subscription setting. Error message: " + exception.Message,
-                    "Subscription Setting", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Fail to delete subscription key. Error message: " + exception.Message,
+                    "Subscription Key", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
